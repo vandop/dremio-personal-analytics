@@ -1,0 +1,14 @@
+{
+  "name": "dbt-dremio-devcontainer",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "python",
+  "workspaceFolder": "/usr/src/app",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": [
+    "ms-python.python",
+    "ms-azuretools.vscode-docker"
+  ],
+  "postCreateCommand": "python -m pip install dbt-dremio"
+}

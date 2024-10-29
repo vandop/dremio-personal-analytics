@@ -1,0 +1,90 @@
+services:
+
+  # Nessie Catalog Server Using In-Memory Store
+  nessie:
+    image: projectnessie/nessie:latest
+    container_name: catalog
+    networks:
+      - dremio-laptop-lakehouse
+    ports:
+      - 19120:19120
+
+  # Minio Storage Server
+  minio:
+    image: minio/minio:latest
+    container_name: storage
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+      - MINIO_DOMAIN=storage
+      - MINIO_REGION_NAME=us-east-1
+      - MINIO_REGION=us-east-1
+    networks:
+      - dremio-laptop-lakehouse
+    ports:
+      - 9001:9001
+      - 9000:9000
+    command: [ "server", "/data", "--console-address", ":9001" ]
+
+  # Dremio
+  dremio:
+    platform: linux/x86_64
+    image: dremio/dremio-oss:latest
+    ports:
+      - 9047:9047
+      - 31010:31010
+      - 32010:32010
+      - 45678:45678
+    container_name: dremio-analytics
+    environment:
+      - DREMIO_JAVA_SERVER_EXTRA_OPTS=-Dpaths.dist=file:///opt/dremio/data/dist
+      - DREMIO_MAX_MEMORY_SIZE_MB=4096
+      - DREMIO_MAX_DIRECT_MEMORY_SIZE_MB=4096
+      - SERVICES_COORDINATOR_ENABLED=true
+      - SERVICES_EXECUTOR_ENABLED=true
+    networks:
+      - dremio-laptop-lakehouse
+    volumes:
+      - dremio_data:/opt/dremio/data:rw
+
+  # Superset
+  superset:
+    image: apache/superset
+    container_name: superset
+    ports:
+      - "8088:8088"
+    networks:
+      - dremio-laptop-lakehouse
+    environment:
+      SUPERSET_LOAD_EXAMPLES: "yes"
+      SUPERSET_SECRET_KEY: c303fcbad0ad359d6c5536dbd2614a85d3698066976ad712
+    volumes:
+      - superset_home:/app/superset_home:rw
+      - .:/usr/src/app:rw
+    depends_on:
+      - dremio
+    command: >
+      /bin/bash -c " /usr/src/app/docker/docker-superset-init.sh && superset run -p 8088 --with-threads --reload --debugger"
+    tty: true
+
+  python:
+    image: python:3.9-slim
+    container_name: python
+    environment:
+      - DBT_PROFILES_DIR=/usr/src/app/
+    volumes:
+      - .:/usr/src/app:rw
+      - dremio_data:/mnt/dremio_data:rw
+    working_dir: /usr/src/app
+    command: /bin/bash -c "apt-get update && apt-get install -y git curl && pip install protobuf==4.21 dbt-core==1.7.0 dbt-dremio==1.7.0 && tail -f /dev/null && /bin/bash"
+    tty: true
+    depends_on:
+      - dremio
+
+networks:
+  dremio-laptop-lakehouse:
+
+
+volumes:
+  superset_home:
+  dremio_data:
