@@ -18,6 +18,7 @@ This guide provides step-by-step instructions to set up a local data lakehouse e
     - [7. Verify the Setup](#7-verify-the-setup)
     - [8. Configure Nessie Source in Dremio Using MinIO](#8-configure-nessie-source-in-dremio-using-minio)
     - [9. Test Writing to the Nessie Source](#9-test-writing-to-the-nessie-source)
+- [Additional Resources](#additional-resources)
 
 ---
 
@@ -138,3 +139,11 @@ To verify that writing to the Nessie source is working correctly, follow these s
     - Click on `NessieSource` and then `datalake` to ensure the `people` table has been created successfully.
 
 This step confirms that you can write to the Nessie source configured in Dremio using MinIO.
+
+## Additional Resources
+
+For more information and advanced configurations, refer to the following resources:
+
+- [Introduction to Dremio, Nessie, and Apache Iceberg on Your Laptop](https://www.dremio.com/blog/intro-to-dremio-nessie-and-apache-iceberg-on-your-laptop/)
+
+These resources provide deeper insights and extended functionalities that you can explore to enhance your data lakehouse setup.
