@@ -41,6 +41,7 @@ Clone the repository containing the `docker-compose.yml` file.
 ```sh
 git clone <repository-url>
 cd <repository-directory>
+```
 
 ### 3. Start the Services
 
