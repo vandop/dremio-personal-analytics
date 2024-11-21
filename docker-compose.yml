@@ -78,6 +78,8 @@ services:
     working_dir: /usr/src/app
     command: /bin/bash -c "apt-get update && apt-get install -y git curl && pip install protobuf==4.21 dbt-core==1.7.0 dbt-dremio==1.7.0 && tail -f /dev/null && /bin/bash"
     tty: true
+    networks:
+    - dremio-laptop-lakehouse
     depends_on:
       - dremio
 
