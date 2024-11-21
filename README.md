@@ -148,3 +148,7 @@ For more information and advanced configurations, refer to the following resourc
 - [Introduction to Dremio, Nessie, and Apache Iceberg on Your Laptop](https://www.dremio.com/blog/intro-to-dremio-nessie-and-apache-iceberg-on-your-laptop/)
 
 These resources provide deeper insights and extended functionalities that you can explore to enhance your data lakehouse setup.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
