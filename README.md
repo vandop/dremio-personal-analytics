@@ -1,9 +1,9 @@
 # dremio-personal-analytics
 Dremio and all dependencies to setup self-analytics
 
-# Setting Up MinIO, Nessie, and Dremio on Your Local Machine
+# Setting Up MinIO and Dremio on Your Local Machine
 
-This guide provides step-by-step instructions to set up a local data lakehouse environment using **MinIO**, **Nessie**, and **Dremio** with Docker and Docker Compose.
+This guide provides step-by-step instructions to set up a local data lakehouse environment using **MinIO** as **Nessie** or **Amazon S3** and **Dremio** with Docker and Docker Compose.
 
 ## Table of Contents
 
@@ -13,11 +13,12 @@ This guide provides step-by-step instructions to set up a local data lakehouse e
     - [2. Clone this Repository](#2-clone-this-repository)
     - [3. Start the Services](#3-start-the-services)
     - [4. Configure MinIO](#4-configure-minio)
-    - [5. Configure Nessie](#5-configure-nessie)
-    - [6. Configure Dremio](#6-configure-dremio)
-    - [7. Verify the Setup](#7-verify-the-setup)
-    - [8. Configure Nessie Source in Dremio Using MinIO](#8-configure-nessie-source-in-dremio-using-minio)
-    - [9. Test Writing to the Nessie Source](#9-test-writing-to-the-nessie-source)
+    - [5. Configure Dremio](#5-configure-dremio)
+    - [6. Verify the Setup](#6-verify-the-setup)
+    - [7. Configure Sources in Dremio Using MinIO](#7-configure-sources-in-dremio-using-minio)
+        - [7.1. Configure Nessie Source in Dremio using MinIO](#71-configure-nessie-source-in-dremio-using-minio)
+        - [7.2. Configure S3 Source in Dremio using MinIO](#72-configure-amazon-s3-source-in-dremio-using-minio)
+    - [8. Test Writing to the Nessie Source](#9-test-writing-to-the-nessie-source)
 - [Additional Resources](#additional-resources)
 
 ---
@@ -62,27 +63,26 @@ Access the MinIO console by navigating to `http://localhost:9000` in your web br
 
 Create a new bucket named `datalake`.
 
-### 5. Configure Nessie
-
-Access the Nessie UI by navigating to `http://localhost:19120` in your web browser. Use the default settings to initialize the repository.
-
-### 6. Configure Dremio
+### 5. Configure Dremio
 
 Access the Dremio UI by navigating to `http://localhost:9047` in your web browser. Follow the setup wizard to complete the initial configuration.
 
-### 7. Verify the Setup
+### 6. Verify the Setup
 
 Ensure all services are running correctly by checking their respective UIs:
 
 - **MinIO**: `http://localhost:9000`
-- **Nessie**: `http://localhost:19120`
 - **Dremio**: `http://localhost:9047`
 
 You should be able to interact with each service without issues.
 
-### 8. Configure Nessie Source in Dremio Using MinIO
+### 7. Configure Sources in Dremio Using MinIO
 
-To configure Nessie as a source in Dremio using MinIO, follow these steps:
+- To configure Nessie as a source in Dremio using MinIO, follow [7.1. Configure Nessie Source in Dremio using MinIO](#71-configure-nessie-source-in-dremio-using-minio).
+
+- To configure Amazon S3 source as a source in Dremio, follow [7.2. Configure S3 Source in Dremio using MinIO](#72-configure-amazon-s3-source-in-dremio-using-minio).
+
+#### 7.1. Configure Nessie Source in Dremio using MinIO
 
 1. **Access Dremio UI**: Navigate to `http://localhost:9047` and log in if you haven't already.
 
@@ -95,14 +95,14 @@ To configure Nessie as a source in Dremio using MinIO, follow these steps:
     - **Nessie Server URL**: Enter `http://nessie:19120/api/v2`.
     - **Authentication Type**: Select `None` (or configure as needed).
  
-    - Go to **Storage** inside Nessie configuratoin
-    - **AWS root patht**: Enter `datalake`.
-    - **AWS Access Key**: Enter `admin`.
-    - **AWS Secret Key**: Enter `password`.
+    - Go to **Storage** inside Nessie configuration
+        - **AWS root patht**: Enter `datalake`.
+        - **AWS Access Key**: Enter `admin`.
+        - **AWS Secret Key**: Enter `password`.
     - User **Other** set the followings Connection Properties:
-    - **fs.s3a.path.style.access**: Enter `true`
-    - **fs.s3a.endpoint**: Enter `minio:9000`
-    - **dremio.s3.compat**: Enter `true`
+        - **fs.s3a.path.style.access**: Enter `true`
+        - **fs.s3a.endpoint**: Enter `minio:9000`
+        - **dremio.s3.compat**: Enter `true`
 
 5. **Save the Configuration**: Click `Save` to add the Nessie source.
 
@@ -112,19 +112,43 @@ To configure Nessie as a source in Dremio using MinIO, follow these steps:
 
 This completes the configuration of Nessie as a source in Dremio using MinIO.
 
-### 9. Test Writing to the Nessie Source
+#### 7.2. Configure Amazon S3 Source in Dremio Using MinIO
 
-To verify that writing to the Nessie source is working correctly, follow these steps:
+1. **Access Dremio UI**: Navigate to `http://localhost:9047` and log in if you haven't already.
+
+2. **Add a New Source**:
+    - Click on the `+` icon next to `Sources` in the left-hand menu.
+    - Select `Amazon S3` from the list of available sources.
+
+3. **Configure the Nessie Source**:
+    - **Name**: Enter a name for the S3 source source, e.g., `S3Source`.
+    - **Authentication Type**: Select `AWS Access Key`.
+    - **AWS Access Key**: Enter `admin`.
+    - **AWS Secret Key**: Enter `password`.
+    - **Disable** the option `Encrypt connection`
+
+    - Go to `Advanced Options` tab and set the following **Connection Properties**:
+        - **fs.s3a.path.style.access**: Enter `true`
+        - **fs.s3a.endpoint**: Enter `minio:9000`
+        - **dremio.s3.compat**: Enter `true`
+        
+    - In `Cache Options` **disable** the option `Enable local caching when possible`
+    
+This completes the configuration of Amazon S3 as a source in Dremio using MinIO.
+
+### 8. Test Writing to the Source
+
+To verify that writing to the source is working correctly, follow these steps and in `<source_name>` replace with `NessieSource` or `S3Source` accordingly:
 
 1. **Access Dremio SQL Editor**:
     - Navigate to `http://localhost:9047` and log in if you haven't already.
     - Click on the `SQL Editor` tab at the top of the page.
 
 2. **Create a New Table**:
-    - In the SQL Editor, enter the following SQL command to create a new table in the `NessieSource`:
+    - In the SQL Editor, enter the following SQL command to create a new table in the source:
 
     ```sql
-    CREATE TABLE NessieSource.datalake.people (
+    CREATE TABLE <source_name>.datalake.people (
         id INT,
         first_name VARCHAR,
         last_name VARCHAR,
@@ -137,9 +161,9 @@ To verify that writing to the Nessie source is working correctly, follow these s
 
 4. **Verify the Table Creation**:
     - Navigate to the `Sources` section in Dremio.
-    - Click on `NessieSource` and then `datalake` to ensure the `people` table has been created successfully.
+    - Click on `<source_name>` and then `datalake` to ensure the `people` table has been created successfully.
 
-This step confirms that you can write to the Nessie source configured in Dremio using MinIO.
+This step confirms that you can write to the source configured in Dremio using MinIO.
 
 ## Additional Resources
 

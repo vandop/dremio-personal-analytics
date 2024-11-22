@@ -25,6 +25,8 @@ services:
       - 9001:9001
       - 9000:9000
     command: [ "server", "/data", "--console-address", ":9001" ]
+    volumes:
+      - minio_data:/data
 
   # Dremio
   dremio:
@@ -90,3 +92,4 @@ networks:
 volumes:
   superset_home:
   dremio_data:
+  minio_data:
