@@ -3,6 +3,7 @@
   "dockerComposeFile": "../docker-compose.yml",
   "service": "python",
   "workspaceFolder": "/usr/src/app",
+  "forwardPorts": [9042,32010,312011],
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash"
   },
