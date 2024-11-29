@@ -170,6 +170,7 @@ This step confirms that you can write to the source configured in Dremio using M
 For more information and advanced configurations, refer to the following resources:
 
 - [Introduction to Dremio, Nessie, and Apache Iceberg on Your Laptop](https://www.dremio.com/blog/intro-to-dremio-nessie-and-apache-iceberg-on-your-laptop/)
+- [Setup a dbt Project](SETUP_DBT.md)
 
 These resources provide deeper insights and extended functionalities that you can explore to enhance your data lakehouse setup.
 
