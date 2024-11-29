@@ -28,6 +28,24 @@ services:
     volumes:
       - minio_data:/data
 
+  minio-setup:
+    image: minio/mc
+    container_name: minio-setup
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until (echo > /dev/tcp/minio/9000) >/dev/null 2>&1; do
+        echo 'Waiting for MinIO...';
+        sleep 2;
+      done;
+      mc alias set myminio http://minio:9000 admin password;
+      mc mb myminio/datalake;
+      mc ls myminio;
+      "
+    networks:
+      - dremio-laptop-lakehouse
+
   # Dremio
   dremio:
     platform: linux/x86_64
@@ -39,7 +57,7 @@ services:
       - 45678:45678
     container_name: dremio-analytics
     environment:
-      - DREMIO_JAVA_SERVER_EXTRA_OPTS=-Dpaths.dist=file:///opt/dremio/data/dist
+      - DREMIO_JAVA_SERVER_EXTRA_OPTS=-Dpaths.dist=file:///opt/dremio/data/dist -Ddebug.addDefaultUser=true
       - DREMIO_MAX_MEMORY_SIZE_MB=4096
       - DREMIO_MAX_DIRECT_MEMORY_SIZE_MB=4096
       - SERVICES_COORDINATOR_ENABLED=true
@@ -48,7 +66,18 @@ services:
       - dremio-laptop-lakehouse
     volumes:
       - dremio_data:/opt/dremio/data:rw
-
+  
+  dremio-setup:
+    image: alpine:latest
+    container_name: dremio-setup
+    depends_on:
+      - dremio
+    volumes:
+      - ./dremio-setup.sh:/dremio-setup.sh
+    command: sh /dremio-setup.sh
+    networks:
+      - dremio-laptop-lakehouse
+      
   # Superset
   superset:
     image: apache/superset
