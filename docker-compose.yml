@@ -69,6 +69,7 @@ services:
       /bin/bash -c " /usr/src/app/docker/docker-superset-init.sh && superset run -p 8088 --with-threads --reload --debugger"
     tty: true
 
+  # Python
   python:
     image: python:3.9-slim
     container_name: python
