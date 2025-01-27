@@ -11,5 +11,10 @@
     "ms-python.python",
     "ms-azuretools.vscode-docker"
   ],
+  "runArgs": [
+  "--userns=keep-id:uid=1000,gid=1000"
+ ],
+ "containerUser": "vscode",
+ "updateRemoteUserUID": true,
   "postCreateCommand": "python -m pip install dbt-dremio"
 }
